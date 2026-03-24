@@ -27,15 +27,16 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm8s_it.h"
-
+#include "daughterboard.h"
 #include "milis.h"
-
+#include "stm8s.h"
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 extern void TimingDelay_Decrement(void);
+extern volatile uint8_t ledpointer;
 /* Private functions ---------------------------------------------------------*/
 
 /* Public functions ----------------------------------------------------------*/
@@ -276,6 +277,25 @@ INTERRUPT_HANDLER(TIM1_CAP_COM_IRQHandler, 12)
   */
 }
 
+INTERRUPT_HANDLER(TIM3_UPD_OVF_BRK_IRQHandler, 15)
+{ 
+  TIM3_ClearITPendingBit(TIM3_IT_UPDATE);
+
+    switch (ledpointer) {
+
+        case 0:
+            GPIO_WriteReverse(LED1_PORT, LED1_PIN);
+            break;
+
+        case 1:
+            GPIO_WriteReverse(LED2_PORT, LED2_PIN);
+            break;
+
+        case 2:
+            GPIO_WriteReverse(LED4_PORT, LED4_PIN);
+            break;
+    }
+}
 /**
   * @brief  Timer2 Capture/Compare Interrupt routine
   * @param  None
@@ -296,12 +316,6 @@ INTERRUPT_HANDLER(TIM1_CAP_COM_IRQHandler, 12)
   * @param  None
   * @retval None
   */
- INTERRUPT_HANDLER(TIM3_UPD_OVF_BRK_IRQHandler, 15)
-{
-  /* In order to detect unexpected events during development,
-     it is recommended to set a breakpoint on the following instruction.
-  */
-}
 
 /**
   * @brief  Timer3 Capture/Compare Interrupt routine
